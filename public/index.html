@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expreso Bolivariano — Sistema de Pasajes y Tienda</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ===============================================
+       DESIGN SYSTEM — EXPRESO BOLIVARIANO
+    ================================================ */
+    :root {
+      --rojo:       #C41E3A;
+      --rojo-dark:  #9B1528;
+      --rojo-light: #E84060;
+      --azul:       #1E3A8A;
+      --azul-light: #2563EB;
+      --verde:      #059669;
+      --verde-light:#10B981;
+      --gris-50:    #F9FAFB;
+      --gris-100:   #F3F4F6;
+      --gris-200:   #E5E7EB;
+      --gris-400:   #9CA3AF;
+      --gris-600:   #4B5563;
+      --gris-800:   #1F2937;
+      --gris-900:   #111827;
+      --shadow-sm:  0 1px 2px rgba(0,0,0,0.06);
+      --shadow:     0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg:  0 10px 30px rgba(0,0,0,0.14);
+      --radius:     10px;
+      --radius-lg:  16px;
+      --transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--gris-100);
+      color: var(--gris-800);
+      min-height: 100vh;
+    }
+
+    /* SCREEN MANAGER */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; }
+
+    /* AUTH SCREEN (Login / Registro) */
+    #screen-auth {
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    #screen-auth::before {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(196,30,58,0.35) 0%, transparent 70%);
+      top: -200px; right: -200px;
+      animation: pulseGlow 4s ease-in-out infinite alternate;
+    }
+    #screen-auth::after {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%);
+      bottom: -150px; left: -100px;
+    }
+
+    @keyframes pulseGlow {
+      from { transform: scale(1); opacity: 0.8; }
+      to   { transform: scale(1.1); opacity: 1; }
+    }
+
+    .auth-card {
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--radius-lg);
+      padding: 40px 36px;
+      width: 470px;
+      max-width: 100%;
+      position: relative;
+      z-index: 10;
+      box-shadow: var(--shadow-lg), 0 0 60px rgba(196,30,58,0.15);
+      animation: slideUp 0.5s ease forwards;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-logo { text-align: center; margin-bottom: 20px; }
+    .auth-logo .logo-icon {
+      width: 66px; height: 66px;
+      background: linear-gradient(135deg, var(--rojo), var(--rojo-light));
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 24px rgba(196,30,58,0.4);
+    }
+    .auth-logo .logo-icon svg { width: 36px; height: 36px; fill: white; }
+    .auth-logo h1 { font-size: 22px; font-weight: 800; color: white; letter-spacing: -0.5px; }
+    .auth-logo p { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 4px; }
+
+    /* DEMO ROLES QUICK SELECTOR */
+    .demo-roles-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px dashed rgba(255,255,255,0.22);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 20px;
+    }
+    .demo-roles-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.75);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .demo-btn-group {
+      display: flex;
+      gap: 6px;
+    }
+    .demo-btn {
+      flex: 1;
+      padding: 8px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.1);
+      color: white;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-family: 'Inter', sans-serif;
+    }
+    .demo-btn:hover {
+      background: rgba(255,255,255,0.25);
+      border-color: white;
+      transform: translateY(-1px);
+    }
+    .demo-btn.btn-test-blocked {
+      border-color: rgba(239,68,68,0.5);
+      color: #FCA5A5;
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 20px;
+      gap: 4px;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 9px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+    }
+    .auth-tab.active {
+      background: var(--rojo);
+      color: white;
+      box-shadow: 0 2px 8px rgba(196,30,58,0.4);
+    }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .form-input {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: var(--radius);
+      color: white;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: var(--transition);
+      outline: none;
+    }
+    .form-input::placeholder { color: rgba(255,255,255,0.35); }
+    .form-input:focus {
+      border-color: var(--rojo-light);
+      background: rgba(255,255,255,0.15);
+      box-shadow: 0 0 0 3px rgba(232,64,96,0.2);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--rojo), var(--rojo-light));
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+      margin-top: 6px;
+    }
+    .btn-primary:hover { filter: brightness(1.08); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .alert {
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 14px;
+      display: none;
+      line-height: 1.4;
+    }
+    .alert.show { display: block; }
+    .alert.error { background: rgba(220,38,38,0.3); color: #FCA5A5; border: 1px solid rgba(220,38,38,0.4); }
+    .alert.success { background: rgba(5,150,105,0.3); color: #6EE7B7; border: 1px solid rgba(5,150,105,0.4); }
+    .alert.warning { background: rgba(217,119,6,0.3); color: #FDE68A; border: 1px solid rgba(217,119,6,0.4); }
+
+    /* MAIN APP LAYOUT */
+    #screen-app { flex-direction: column; min-height: 100vh; }
+
+    /* HEADER */
+    .app-header {
+      background: linear-gradient(135deg, var(--rojo-dark), var(--rojo));
+      padding: 0 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-logo { display: flex; align-items: center; gap: 12px; flex: 1; }
+    .header-logo .logo-box {
+      width: 40px; height: 40px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .header-logo .logo-box svg { width: 22px; height: 22px; fill: white; }
+    .header-title { font-size: 18px; font-weight: 700; color: white; }
+    .header-sub { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 1px; }
+
+    .header-user { display: flex; align-items: center; gap: 10px; }
+    .user-badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 24px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ROLE BADGES */
+    .role-badge {
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .role-badge.role-superadmin {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FCD34D;
+    }
+    .role-badge.role-pasajero {
+      background: #D1FAE5;
+      color: #065F46;
+      border: 1px solid #6EE7B7;
+    }
+
+    .btn-logout {
+      padding: 7px 16px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 8px;
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,0.22); }
+
+    .api-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.85);
+      font-weight: 600;
+    }
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #6EE7B7;
+      animation: blink 2s ease infinite;
+    }
+    .status-dot.offline { background: #FCA5A5; animation: none; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* NAVIGATION TABS */
+    .nav-tabs {
+      background: white;
+      border-bottom: 1px solid var(--gris-200);
+      padding: 0 24px;
+      display: flex;
+      gap: 4px;
+      box-shadow: var(--shadow-sm);
+      overflow-x: auto;
+    }
+    .nav-tab {
+      padding: 16px 18px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gris-400);
+      cursor: pointer;
+      transition: var(--transition);
+      border-bottom: 3px solid transparent;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+    .nav-tab:hover { color: var(--gris-600); }
+    .nav-tab.active {
+      color: var(--rojo);
+      border-bottom-color: var(--rojo);
+    }
+    .nav-tab .tab-icon { font-size: 16px; }
+
+    /* APP BODY */
+    .app-body { flex: 1; padding: 24px; max-width: 1240px; width: 100%; margin: 0 auto; }
+    .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+    .tab-panel.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CARDS */
+    .card {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--gris-200);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--gris-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .card-title { font-size: 17px; font-weight: 700; color: var(--gris-800); }
+    .card-subtitle { font-size: 13px; color: var(--gris-400); margin-top: 2px; }
+    .card-body { padding: 24px; }
+
+    /* TOOLBAR */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .search-box { flex: 1; min-width: 220px; position: relative; }
+    .search-box input {
+      width: 100%;
+      padding: 10px 16px 10px 40px;
+      border: 1px solid var(--gris-200);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: var(--transition);
+      color: var(--gris-800);
+    }
+    .search-box input:focus {
+      border-color: var(--azul-light);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gris-400);
+      font-size: 15px;
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: 9px 16px;
+      border-radius: var(--radius);
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-secondary { background: var(--gris-100); color: var(--gris-600); border: 1px solid var(--gris-200); }
+    .btn-secondary:hover { background: var(--gris-200); }
+    .btn-success { background: linear-gradient(135deg, var(--verde), var(--verde-light)); color: white; }
+    .btn-success:hover { filter: brightness(1.08); }
+    .btn-danger { background: linear-gradient(135deg, #DC2626, #EF4444); color: white; }
+    .btn-danger:hover { filter: brightness(1.08); }
+    .btn-blue { background: linear-gradient(135deg, var(--azul), var(--azul-light)); color: white; }
+    .btn-blue:hover { filter: brightness(1.08); }
+    .btn-warning { background: linear-gradient(135deg, #D97706, #F59E0B); color: white; }
+    .btn-warning:hover { filter: brightness(1.08); }
+
+    /* TABLES */
+    .table-wrapper { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--gris-200); }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: var(--gris-50);
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gris-600);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 1px solid var(--gris-200);
+    }
+    tbody tr { border-bottom: 1px solid var(--gris-100); transition: var(--transition); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(37,99,235,0.03); }
+    tbody tr.selected { background: rgba(196,30,58,0.06); }
+    tbody td { padding: 12px 16px; font-size: 13px; }
+
+    /* BADGES */
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .badge-blue { background: #DBEAFE; color: #1E40AF; }
+    .badge-green { background: #D1FAE5; color: #065F46; }
+    .badge-yellow { background: #FEF3C7; color: #92400E; }
+    .badge-red { background: #FEE2E2; color: #991B1B; }
+
+    /* CHECKOUT PANEL */
+    .checkout-panel {
+      background: var(--gris-50);
+      border-radius: var(--radius);
+      border: 1px solid var(--gris-200);
+      padding: 20px;
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .checkout-info { flex: 1; min-width: 220px; }
+    .checkout-label { font-size: 11px; color: var(--gris-400); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .checkout-value { font-size: 15px; font-weight: 700; color: var(--gris-800); margin-top: 2px; }
+    .qty-control { display: flex; align-items: center; border: 1px solid var(--gris-200); border-radius: var(--radius); background: white; }
+    .qty-btn { width: 34px; height: 36px; border: none; background: transparent; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .qty-btn:hover { background: var(--gris-100); }
+    .qty-display { width: 44px; text-align: center; border: none; font-size: 14px; font-weight: 700; outline: none; }
+    .select-input { padding: 9px 12px; border: 1px solid var(--gris-200); border-radius: var(--radius); font-size: 13px; font-family: 'Inter', sans-serif; outline: none; background: white; }
+
+    /* STATS BAR */
+    .stats-bar { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+    .stat-card {
+      flex: 1; min-width: 140px; background: white; border: 1px solid var(--gris-200);
+      border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: var(--shadow-sm);
+    }
+    .stat-label { font-size: 12px; color: var(--gris-400); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+    .stat-value { font-size: 26px; font-weight: 800; color: var(--gris-800); margin-top: 4px; }
+    .stat-sub { font-size: 12px; color: var(--gris-400); margin-top: 2px; }
+
+    .filter-group { display: flex; background: var(--gris-100); border-radius: var(--radius); padding: 4px; gap: 4px; }
+    .filter-btn {
+      padding: 7px 14px; border: none; border-radius: 8px; background: transparent;
+      color: var(--gris-400); font-size: 12px; font-weight: 600; cursor: pointer; transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+    }
+    .filter-btn.active { background: white; color: var(--gris-800); box-shadow: var(--shadow-sm); }
+
+    /* PLANILLA */
+    .planilla-card {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .planilla-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+    .planilla-empresa { font-size: 12px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; }
+    .planilla-id { font-size: 20px; font-weight: 800; margin-top: 4px; }
+    .planilla-badge {
+      background: rgba(5,150,105,0.25); border: 1px solid rgba(5,150,105,0.4);
+      color: #6EE7B7; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    }
+    .planilla-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .planilla-item-label { font-size: 11px; color: rgba(255,255,255,0.45); text-transform: uppercase; margin-bottom: 4px; }
+    .planilla-item-value { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.9); }
+
+    /* FORMS & GRIDS */
+    .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 650px) { .admin-grid { grid-template-columns: 1fr; } }
+    .input-group { display: flex; flex-direction: column; gap: 6px; }
+    .input-label { font-size: 12px; font-weight: 600; color: var(--gris-600); }
+    .text-input {
+      padding: 10px 14px; border: 1px solid var(--gris-200); border-radius: var(--radius);
+      font-size: 14px; font-family: 'Inter', sans-serif; color: var(--gris-800); outline: none; transition: var(--transition);
+    }
+    .text-input:focus { border-color: var(--azul-light); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+    /* TOAST */
+    .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+    .toast {
+      background: white; border-radius: var(--radius); padding: 14px 18px; box-shadow: var(--shadow-lg);
+      display: flex; align-items: center; gap: 12px; min-width: 280px; max-width: 400px; border-left: 4px solid;
+      animation: slideInRight 0.3s ease; font-size: 13px; font-weight: 500; color: var(--gris-800);
+    }
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+    .toast.success { border-color: var(--verde); }
+    .toast.error   { border-color: #DC2626; }
+    .toast.info    { border-color: var(--azul-light); }
+    .toast.warning { border-color: #D97706; }
+
+    .spinner {
+      width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+      border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-state { text-align: center; padding: 40px 24px; color: var(--gris-400); }
+    .empty-state .empty-icon { font-size: 40px; margin-bottom: 8px; }
+    .empty-state h3 { font-size: 15px; font-weight: 600; color: var(--gris-600); margin-bottom: 4px; }
+    .empty-state p { font-size: 13px; }
+
+    .app-footer {
+      background: white; border-top: 1px solid var(--gris-200); padding: 12px 24px;
+      display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--gris-400);
+      flex-wrap: wrap; gap: 8px;
+    }
+    .footer-api { font-size: 11px; font-weight: 600; color: var(--verde); display: flex; align-items: center; gap: 5px; }
+    .precio-tag { font-weight: 700; color: var(--rojo); }
+
+    /* ROLE CALLOUT BANNER */
+    .role-callout {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: #1E40AF;
+    }
+    .role-callout strong { font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<!-- ==========================================
+     SCREEN 1: AUTENTICACIÓN
+=========================================== -->
+<div id="screen-auth" class="screen active">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+        </svg>
+      </div>
+      <h1>Expreso Bolivariano</h1>
+      <p>Control de Acceso por Roles (RBAC) — API REST</p>
+    </div>
+
+    <!-- BOTONES DE ACCESO RÁPIDO PARA EVALUACIÓN -->
+    <div class="demo-roles-box">
+      <div class="demo-roles-title">Acceso Rápido para Pruebas:</div>
+      <div class="demo-btn-group">
+        <button class="demo-btn" onclick="fillCredentials('cliente1', '1234')">
+          👤 Pasajero (cliente1)
+        </button>
+        <button class="demo-btn" onclick="fillCredentials('admin', 'admin123')">
+          🛡️ Administrador (admin)
+        </button>
+        <button class="demo-btn" onclick="fillCredentials('superadmin', 'admin123')">
+          👑 Superadmin (superadmin)
+        </button>
+      </div>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Iniciar Sesión</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Registrarse como Pasajero</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="tab-login">
+      <div class="form-group">
+        <label class="form-label">Usuario</label>
+        <input id="inp-login-user" class="form-input" type="text" placeholder="Ingrese su usuario" autocomplete="username" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input id="inp-login-pass" class="form-input" type="password" placeholder="Ingrese su contraseña" autocomplete="current-password" />
+      </div>
+      <button class="btn-primary" id="btn-login" onclick="doLogin()">Ingresar al Sistema</button>
+      <div id="alert-login" class="alert"></div>
+    </div>
+
+    <!-- REGISTER FORM (EXCLUSIVO PASAJERO) -->
+    <div id="tab-register" style="display:none">
+      <div style="background:rgba(255,255,255,0.08); border-radius:8px; padding:12px; margin-bottom:14px; font-size:12px; color:rgba(255,255,255,0.85); line-height:1.4;">
+        🎫 <strong>Registro Exclusivo de Pasajeros:</strong> Complete los campos para crear su cuenta y adquirir pasajes en línea.<br>
+        <small style="color:#FDE68A;">⚠️ <em>Nota de seguridad:</em> Los usuarios administradores no se pueden registrar aquí; son registrados exclusivamente por el Superadministrador, quien les define su contraseña.</small>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nombre de Usuario (Pasajero)</label>
+        <input id="inp-reg-user" class="form-input" type="text" placeholder="Elija su usuario de pasajero" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input id="inp-reg-pass" class="form-input" type="password" placeholder="Elija una contraseña segura" />
+      </div>
+      <button class="btn-primary" id="btn-register" onclick="doRegister()">Crear Cuenta de Pasajero</button>
+      <div id="alert-register" class="alert"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==========================================
+     SCREEN 2: APLICACIÓN PRINCIPAL
+=========================================== -->
+<div id="screen-app" class="screen">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-logo">
+      <div class="logo-box">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="header-title">Expreso Bolivariano</div>
+        <div class="header-sub">Arquitectura SOA & API REST — Sistema de Tiquetes</div>
+      </div>
+    </div>
+    <div class="header-user">
+      <div class="api-status" id="api-status-indicator">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Conectando...</span>
+      </div>
+      <div class="user-badge">
+        <span>👤 <strong id="label-usuario">...</strong></span>
+        <span id="label-rol" class="role-badge role-pasajero">Pasajero</span>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <!-- NAVEGACIÓN DINÁMICA SEGÚN ROL -->
+  <nav class="nav-tabs" id="main-nav-tabs">
+    <!-- Visible para Pasajero y Superadmin -->
+    <button class="nav-tab active" onclick="switchTab('catalogo')" id="nav-catalogo">
+      <span class="tab-icon">🎫</span> Catálogo y Compra
+    </button>
+    <button class="nav-tab" onclick="switchTab('historial')" id="nav-historial">
+      <span class="tab-icon">📋</span> Mis Pasajes
+    </button>
+    <!-- EXCLUSIVO PASAJERO: Servicio al Cliente para cancelar viaje -->
+    <button class="nav-tab" onclick="switchTab('soporte-pasajero')" id="nav-soporte-pasajero">
+      <span class="tab-icon">🎧</span> Servicio al Cliente (Cancelar Viaje)
+    </button>
+    <!-- EXCLUSIVOS ADMIN y SUPERADMIN: Despacho, Catálogo, PQRS -->
+    <button class="nav-tab" onclick="switchTab('despacho')" id="nav-despacho" style="display:none;">
+      <span class="tab-icon">🚌</span> Despacho (Planilla)
+    </button>
+    <button class="nav-tab" onclick="switchTab('admin')" id="nav-admin" style="display:none;">
+      <span class="tab-icon">⚙️</span> Gestión de Rutas
+    </button>
+    <button class="nav-tab" onclick="switchTab('pqrs-admin')" id="nav-pqrs-admin" style="display:none;">
+      <span class="tab-icon">🛎️</span> Gestión de Cancelaciones PQRS
+    </button>
+    <!-- EXCLUSIVO SUPERADMIN: Registrar y gestionar administradores -->
+    <button class="nav-tab" onclick="switchTab('gestion-admins')" id="nav-gestion-admins" style="display:none;">
+      <span class="tab-icon">👥</span> Registrar Administradores
+    </button>
+  </nav>
+
+  <!-- APP BODY -->
+  <main class="app-body">
+
+    <!-- BANNER INFORMATIVO DEL ROL ACTIVO -->
+    <div id="role-banner" class="role-callout">
+      <span id="role-icon" style="font-size:20px;">ℹ️</span>
+      <div id="role-desc">Cargando permisos del rol...</div>
+    </div>
+
+    <!-- ==========================================
+         TAB 1: CATÁLOGO Y COMPRA (Pasajero & Superadmin)
+    =========================================== -->
+    <div id="panel-catalogo" class="tab-panel active">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Catálogo Oficial de Rutas y Tarifas</div>
+            <div class="card-subtitle">Seleccione una ruta disponible y complete la reserva de sus pasajes</div>
+          </div>
+          <button class="btn btn-secondary" onclick="loadProductos()">⟳ Actualizar Rutas</button>
+        </div>
+        <div class="card-body">
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="search-productos" placeholder="Buscar destino, ciudad o servicio..." oninput="filtrarProductos()" />
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Ruta / Modalidad de Servicio</th>
+                  <th>Tarifa Oficial (COP)</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-productos">
+                <tr><td colspan="4"><div class="empty-state"><div class="empty-icon">⏳</div><h3>Cargando catálogo...</h3></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- CHECKOUT / PANEL DE COMPRA -->
+          <div class="checkout-panel">
+            <div class="checkout-info">
+              <div class="checkout-label">Ruta Seleccionada</div>
+              <div class="checkout-value" id="checkout-nombre">Ninguno seleccionado — haga clic en "Seleccionar"</div>
+            </div>
+            <div>
+              <div class="checkout-label">Cantidad de Sillas</div>
+              <div class="qty-control">
+                <button class="qty-btn" onclick="changeQty(-1)">−</button>
+                <input type="number" class="qty-display" id="qty-input" value="1" min="1" max="10" />
+                <button class="qty-btn" onclick="changeQty(1)">+</button>
+              </div>
+            </div>
+            <div>
+              <div class="checkout-label">Medio de Pago</div>
+              <select class="select-input" id="medio-pago">
+                <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                <option value="PSE">PSE — Débito Bancario</option>
+                <option value="Nequi">Nequi</option>
+                <option value="Daviplata">Daviplata</option>
+                <option value="Efectivo en Taquilla">Efectivo en Taquilla</option>
+              </select>
+            </div>
+            <div>
+              <div class="checkout-label">Total a Pagar</div>
+              <div class="checkout-value precio-tag" id="checkout-total">$ 0 COP</div>
+            </div>
+            <button class="btn btn-success" id="btn-comprar" onclick="doCompra()">
+              ✅ Confirmar Compra
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         TAB 2: HISTORIAL
+    =========================================== -->
+    <div id="panel-historial" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title" id="historial-title">Historial de Compras y Pasajes</div>
+            <div class="card-subtitle" id="historial-subtitle">Tiquetes emitidos y registrados en base de datos</div>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <div class="filter-group" id="container-filtro-historial">
+              <button class="filter-btn active" id="filtro-mios" onclick="setFiltro('mios')">Mis Compras</button>
+              <button class="filter-btn" id="filtro-todos" onclick="setFiltro('todos')">Todas las Ventas</button>
+            </div>
+            <button class="btn btn-secondary" onclick="loadHistorial()">⟳ Refrescar</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="stats-bar" id="stats-bar">
+            <div class="stat-card">
+              <div class="stat-label">Transacciones</div>
+              <div class="stat-value" id="stat-transacciones">0</div>
+              <div class="stat-sub">Registros en historial</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Total Sillas Compradas</div>
+              <div class="stat-value" id="stat-tiquetes">0</div>
+              <div class="stat-sub">Pasajes acumulados</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Endpoint REST RBAC</div>
+              <div class="stat-value" style="font-size:16px; color:var(--verde);">GET /api/v1/ventas/historial</div>
+              <div class="stat-sub" id="stat-rbac-note">Filtro por rol activo</div>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID Compra</th>
+                  <th>Pasajero / Titular</th>
+                  <th>Ruta Adquirida</th>
+                  <th>Sillas</th>
+                  <th>Opciones Disponibles</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-historial">
+                <tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📋</div><h3>Cargando historial...</h3></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         TAB 3: SERVICIO AL CLIENTE (Exclusivo Pasajero)
+    =========================================== -->
+    <div id="panel-soporte-pasajero" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🎧 Servicio al Cliente — Solicitud de Cancelación de Viaje</div>
+            <div class="card-subtitle">Radique una solicitud de contacto formal para gestionar la anulación o eliminación de su pasaje</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="background:#FEF3C7; border:1px solid #FCD34D; border-radius:var(--radius); padding:14px; margin-bottom:20px; font-size:13px; color:#92400E;">
+            📌 <strong>Política de Servicio al Cliente:</strong> Según las directrices de transporte intermunicipal, las cancelaciones o eliminaciones de viaje deben ser tramitadas a través de nuestro equipo de atención. Al enviar este formulario se generará un radicado formal (PQRS) y un asesor gestionará la anulación de su tiquete.
+          </div>
+
+          <div class="admin-grid" style="margin-bottom:16px;">
+            <div class="input-group">
+              <label class="input-label">Seleccione el Viaje / Pasaje a Cancelar</label>
+              <select id="soporte-select-compra" class="text-input">
+                <option value="">Cargando sus pasajes...</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Motivo de la Cancelación</label>
+              <select id="soporte-motivo" class="text-input">
+                <option value="Cambio de fecha o itinerario de viaje">Cambio de fecha o itinerario de viaje</option>
+                <option value="Calamidad doméstica o incapacidad médica">Calamidad doméstica o incapacidad médica</option>
+                <option value="Error involuntario en origen, destino o pasajero">Error involuntario en origen, destino o pasajero</option>
+                <option value="Cancelación definitiva del viaje">Cancelación definitiva del viaje</option>
+                <option value="Inconveniente de transporte u otro motivo">Inconveniente de transporte u otro motivo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="admin-grid" style="margin-bottom:16px;">
+            <div class="input-group">
+              <label class="input-label">Teléfono o Correo Electrónico de Contacto</label>
+              <input type="text" id="soporte-contacto" class="text-input" placeholder="Ej: 3105559876 / mi-correo@gmail.com" />
+            </div>
+            <div class="input-group">
+              <label class="input-label">Detalles u Observaciones Adicionales</label>
+              <input type="text" id="soporte-obs" class="text-input" placeholder="Explique brevemente su situación..." />
+            </div>
+          </div>
+
+          <button class="btn btn-warning" id="btn-enviar-soporte" onclick="doSolicitarCancelacion()">
+            📨 Radicar Solicitud ante Servicio al Cliente
+          </button>
+          <div id="soporte-alert" class="alert" style="margin-top:14px;"></div>
+        </div>
+      </div>
+
+      <!-- TABLA DE MIS SOLICITUDES DE CANCELACIÓN RADICADAS -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Mis Solicitudes Radicadas ante Servicio al Cliente</div>
+            <div class="card-subtitle">Seguimiento en tiempo real de sus solicitudes de cancelación</div>
+          </div>
+          <button class="btn btn-secondary" onclick="loadMisSolicitudesSoporte()">⟳ Refrescar Estado</button>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Radicado PQRS</th>
+                  <th>Ruta Solicitada</th>
+                  <th>Motivo</th>
+                  <th>Fecha Radicación</th>
+                  <th>Estado</th>
+                  <th>Respuesta / Atención</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-mis-solicitudes">
+                <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><h3>No tiene solicitudes radicadas</h3></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         TAB 4: DESPACHO Y PLANILLA (Exclusivo Superadmin)
+    =========================================== -->
+    <div id="panel-despacho" class="tab-panel">
+      <div class="planilla-card">
+        <div class="planilla-header">
+          <div>
+            <div class="planilla-empresa">Expreso Bolivariano S.A. — Módulo de Despacho Operativo</div>
+            <div class="planilla-id" id="planilla-id">PLN-2026-0928</div>
+          </div>
+          <div class="planilla-badge" id="planilla-estado">● ACTIVA</div>
+        </div>
+        <div class="planilla-grid" id="planilla-grid">
+          <div class="planilla-item">
+            <div class="planilla-item-label">Bus / Móvil Asignado</div>
+            <div class="planilla-item-value" id="planilla-bus">MÓVIL-4052</div>
+          </div>
+          <div class="planilla-item">
+            <div class="planilla-item-label">Conductor Principal</div>
+            <div class="planilla-item-value" id="planilla-conductor">Carlos Alberto Mendoza</div>
+          </div>
+          <div class="planilla-item">
+            <div class="planilla-item-label">Ruta Operativa</div>
+            <div class="planilla-item-value" id="planilla-ruta">Bogotá → Medellín</div>
+          </div>
+          <div class="planilla-item">
+            <div class="planilla-item-label">Total Pasajeros a Bordo</div>
+            <div class="planilla-item-value" id="planilla-total">0</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="loadPlanilla()" style="background:rgba(255,255,255,0.15); color:white; border-color:rgba(255,255,255,0.25);">
+          ⟳ Actualizar Planilla Oficial
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Listado de Pasajeros para Abordaje</div>
+            <div class="card-subtitle">Generado automáticamente por el servicio de despacho desde la base de datos</div>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Pasajero Registrado</th>
+                  <th>Ruta / Destino</th>
+                  <th>Sillas Asignadas</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-despacho">
+                <tr><td colspan="4"><div class="empty-state"><div class="empty-icon">🚌</div><h3>Sin pasajeros en la planilla</h3></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         TAB 5: GESTIÓN DE CATÁLOGO (Exclusivo Superadmin)
+    =========================================== -->
+    <div id="panel-admin" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Administración del Catálogo de Rutas</div>
+            <div class="card-subtitle">Permite agregar nuevas rutas intermunicipales o actualizar tarifas</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="admin-grid" style="margin-bottom:16px;">
+            <div class="input-group">
+              <label class="input-label">Nombre de Ruta y Tipo de Servicio</label>
+              <input class="text-input" id="admin-nombre" type="text" placeholder="Ej: Pasaje Bogotá - Neiva (Servicio 2G)" />
+            </div>
+            <div class="input-group">
+              <label class="input-label">Precio / Tarifa Oficial (COP)</label>
+              <input class="text-input" id="admin-precio" type="number" placeholder="Ej: 60000" min="1000" />
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-blue" onclick="doAgregarProducto()">➕ Registrar Nueva Ruta</button>
+            <button class="btn btn-danger" onclick="doEliminarProducto()">🗑 Eliminar Ruta Seleccionada</button>
+            <button class="btn btn-secondary" onclick="loadAdminTabla()">⟳ Refrescar Tabla</button>
+          </div>
+          <div id="admin-alert" class="alert" style="margin-top:14px;"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Inventario Actual de Rutas en Base de Datos</div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Ruta / Servicio</th>
+                  <th>Tarifa (COP)</th>
+                  <th>Endpoint REST</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-admin">
+                <tr><td colspan="4"><div class="empty-state"><div class="empty-icon">⏳</div><h3>Cargando...</h3></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         TAB 6: GESTIÓN DE PQRS Y CANCELACIONES (Exclusivo Superadmin)
+    =========================================== -->
+    <div id="panel-pqrs-admin" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🛎️ Bandeja de Cancelaciones — Servicio al Cliente</div>
+            <div class="card-subtitle">Solicitudes radicadas por pasajeros para anular pasajes y eliminar viajes</div>
+          </div>
+          <button class="btn btn-secondary" onclick="loadAdminPQRS()">⟳ Refrescar Solicitudes</button>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Radicado</th>
+                  <th>Pasajero</th>
+                  <th>ID Compra / Ruta</th>
+                  <th>Motivo & Contacto</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                  <th>Gestión de Servicio al Cliente</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-admin-pqrs">
+                <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⏳</div><h3>Cargando solicitudes...</h3></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         TAB 7: GESTIÓN DE ADMINISTRADORES (Exclusivo Superadmin)
+    =========================================== -->
+    <div id="panel-gestion-admins" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">👑 Aprovisionamiento de Administradores (Superadmin)</div>
+            <div class="card-subtitle">Creación y auditoría de cuentas con rol Administrador</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:var(--radius); padding:14px; margin-bottom:20px; font-size:13px; color:#1E40AF;">
+            🔒 <strong>Política de Seguridad Institucional:</strong> Solo el usuario Superadministrador tiene la potestad de crear usuarios con rol Administrador. <strong>Los usuarios administradores creados NO tienen permitido el inicio de sesión directo en la plataforma.</strong>
+          </div>
+
+          <div class="admin-grid" style="margin-bottom:16px;">
+            <div class="input-group">
+              <label class="input-label">Nombre de Usuario para el Administrador</label>
+              <input type="text" id="nuevo-admin-user" class="text-input" placeholder="Ej: admin_regional, taquilla_norte" />
+            </div>
+            <div class="input-group">
+              <label class="input-label">Contraseña Asignada</label>
+              <input type="password" id="nuevo-admin-pass" class="text-input" placeholder="Contraseña segura" />
+            </div>
+          </div>
+
+          <button class="btn btn-blue" onclick="doCrearAdministrador()">
+            ➕ Crear Usuario Administrador
+          </button>
+          <div id="superadmin-alert" class="alert" style="margin-top:14px;"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Listado de Usuarios Administradores Registrados</div>
+            <div class="card-subtitle">Cuentas creadas bajo supervisión del Superadministrador</div>
+          </div>
+          <button class="btn btn-secondary" onclick="loadListaAdministradores()">⟳ Refrescar Administradores</button>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Usuario</th>
+                  <th>Rol Asignado</th>
+                  <th>Acceso de Inicio Directo</th>
+                  <th>Política de Seguridad</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-lista-admins">
+                <tr><td colspan="5"><div class="empty-state"><div class="empty-icon">⏳</div><h3>Cargando administradores...</h3></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <span>Arquitectura de Software · Politécnico Grancolombiano · Subgrupo 13</span>
+    <span class="footer-api">
+      🟢 <span>REST API + RBAC (Pasajero / Superadmin) · Backend Express + SQLite</span>
+    </span>
+  </footer>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ==========================================
+     JAVASCRIPT — LÓGICA DE CONTROL POR ROLES
+=========================================== -->
+<script>
+  // ============ ESTADO DE LA APLICACIÓN ============
+  const API = 'http://localhost:3000/api/v1';
+  let sesion = { usuario: null, token: null, rol: null };
+  let todosProductos = [];
+  let misComprasUsuario = [];
+  let productoSeleccionado = null;
+  let adminProductoSeleccionado = null;
+  let filtroHistorial = 'mios';
+
+  // ============ UTILS ============
+  const $ = id => document.getElementById(id);
+  const fmt = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n);
+
+  function toast(msg, type = 'success') {
+    const container = $('toast-container');
+    const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+    const div = document.createElement('div');
+    div.className = `toast ${type}`;
+    div.innerHTML = `<span class="toast-icon">${icons[type] || 'ℹ️'}</span> ${msg}`;
+    container.appendChild(div);
+    setTimeout(() => {
+      div.style.opacity = '0';
+      div.style.transform = 'translateX(40px)';
+      div.style.transition = 'all 0.3s';
+      setTimeout(() => div.remove(), 300);
+    }, 4500);
+  }
+
+  function showAlert(id, msg, type) {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.className = `alert show ${type}`;
+    setTimeout(() => el.className = 'alert', 6000);
+  }
+
+  async function apiFetch(method, path, body) {
+    const opts = {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-role': sesion.rol || '',
+        'x-user-name': sesion.usuario || ''
+      },
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(API + path, opts);
+    return res.json();
+  }
+
+  // ============ STATUS CHECK ============
+  async function checkApiStatus() {
+    try {
+      const r = await fetch(API + '/catalogo/rutas', { signal: AbortSignal.timeout(2000) });
+      if (r.ok) {
+        $('status-dot').classList.remove('offline');
+        $('status-text').textContent = 'API REST Online';
+      }
+    } catch {
+      $('status-dot').classList.add('offline');
+      $('status-text').textContent = 'API Offline';
+    }
+  }
+
+  // ============ AUTH / LOGIN ============
+  function switchAuthTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach((t, i) => t.classList.toggle('active', i === (tab === 'login' ? 0 : 1)));
+    $('tab-login').style.display = tab === 'login' ? '' : 'none';
+    $('tab-register').style.display = tab === 'register' ? '' : 'none';
+  }
+
+  function fillCredentials(user, pass) {
+    switchAuthTab('login');
+    $('inp-login-user').value = user;
+    $('inp-login-pass').value = pass;
+    if (user === 'admin') {
+      toast(`Credenciales de '${user}' completadas. Al intentar ingresar comprobará que los administradores no pueden iniciar sesión directamente.`, 'warning');
+    } else {
+      toast(`Credenciales de '${user}' completadas. Haga clic en 'Ingresar'.`, 'info');
+    }
+  }
+
+  async function doLogin() {
+    const usuario = $('inp-login-user').value.trim();
+    const clave   = $('inp-login-pass').value.trim();
+    if (!usuario || !clave) return showAlert('alert-login', 'Complete todos los campos.', 'error');
+
+    const btn = $('btn-login');
+    btn.innerHTML = '<span class="spinner"></span> Validando credenciales...';
+    btn.disabled = true;
+
+    try {
+      const data = await apiFetch('POST', '/auth/login', { usuario, clave });
+      if (data.exito) {
+        sesion = {
+          usuario: data.usuario,
+          rol: data.rol,
+          token: data.token
+        };
+        enterApp();
+      } else {
+        // Muestra el motivo exacto (ej. bloqueo directo de administradores)
+        showAlert('alert-login', data.mensaje || 'Credenciales incorrectas.', 'error');
+        toast(data.mensaje || 'Error al iniciar sesión.', 'error');
+      }
+    } catch (e) {
+      showAlert('alert-login', 'No se pudo conectar con el servidor REST.', 'error');
+    } finally {
+      btn.innerHTML = 'Ingresar al Sistema';
+      btn.disabled = false;
+    }
+  }
+
+  // REGISTRO PÚBLICO: Exclusivo Pasajeros
+  async function doRegister() {
+    const usuario = $('inp-reg-user').value.trim();
+    const clave   = $('inp-reg-pass').value.trim();
+    if (!usuario || !clave) return showAlert('alert-register', 'Complete todos los campos.', 'error');
+
+    const btn = $('btn-register');
+    btn.innerHTML = '<span class="spinner"></span> Registrando pasajero...';
+    btn.disabled = true;
+
+    try {
+      const data = await apiFetch('POST', '/auth/register', { usuario, clave });
+      if (data.exito) {
+        showAlert('alert-register', data.mensaje, 'success');
+        toast(`¡Pasajero ${usuario} registrado con éxito!`, 'success');
+        $('inp-reg-user').value = '';
+        $('inp-reg-pass').value = '';
+        setTimeout(() => {
+          switchAuthTab('login');
+          fillCredentials(usuario, clave);
+        }, 1500);
+      } else {
+        showAlert('alert-register', data.mensaje || 'Error al registrar.', 'error');
+      }
+    } catch {
+      showAlert('alert-register', 'Error de conexión con el backend.', 'error');
+    } finally {
+      btn.innerHTML = 'Crear Cuenta de Pasajero';
+      btn.disabled = false;
+    }
+  }
+
+  // ============ APLICACIÓN Y RENDER SEGÚN ROL ============
+  function enterApp() {
+    $('screen-auth').classList.remove('active');
+    $('screen-app').classList.add('active');
+
+    const isPasajero = sesion.rol === 'pasajero';
+    const isAdmin = sesion.rol === 'admin';
+    const isSuperadmin = sesion.rol === 'superadmin';
+
+    // Header updates
+    $('label-usuario').textContent = sesion.usuario;
+    const badgeRol = $('label-rol');
+    if (isSuperadmin) {
+      badgeRol.textContent = 'Superadministrador';
+      badgeRol.className = 'role-badge role-superadmin';
+    } else if (isAdmin) {
+      badgeRol.textContent = 'Administrador';
+      badgeRol.className = 'role-badge role-admin';
+    } else {
+      badgeRol.textContent = 'Pasajero';
+      badgeRol.className = 'role-badge role-pasajero';
+    }
+
+    // Configurar pestañas visibles según el rol
+    // Admin y Superadmin pueden ver Despacho, Rutas y PQRS
+    $('nav-despacho').style.display = (isAdmin || isSuperadmin) ? '' : 'none';
+    $('nav-admin').style.display = (isAdmin || isSuperadmin) ? '' : 'none';
+    $('nav-pqrs-admin').style.display = (isAdmin || isSuperadmin) ? '' : 'none';
+    // Solo Superadmin puede crear Administradores
+    $('nav-gestion-admins').style.display = isSuperadmin ? '' : 'none';
+    // Solo Pasajero ve la pestaña de solicitar cancelación a servicio al cliente
+    $('nav-soporte-pasajero').style.display = isPasajero ? '' : 'none';
+
+    // Banner descriptivo del rol
+    const banner = $('role-banner');
+    const roleDesc = $('role-desc');
+    const roleIcon = $('role-icon');
+
+    if (isPasajero) {
+      banner.style.background = '#EFF6FF';
+      banner.style.borderColor = '#BFDBFE';
+      banner.style.color = '#1E40AF';
+      roleIcon.textContent = '👤';
+      roleDesc.innerHTML = `<strong>Sesión activa como Pasajero (${sesion.usuario}):</strong> Puedes explorar el catálogo, adquirir pasajes, revisar tu historial exclusivo y radicar solicitudes ante Servicio al Cliente para cancelar o eliminar viajes. Las funciones administrativas y de despacho están restringidas.`;
+
+      $('historial-title').textContent = 'Mis Pasajes e Historial de Compra';
+      $('historial-subtitle').textContent = 'Listado exclusivo de sus viajes registrados';
+      $('container-filtro-historial').style.display = 'none';
+      setFiltro('mios');
+    } else if (isAdmin) {
+      banner.style.background = '#FEF3C7';
+      banner.style.borderColor = '#FCD34D';
+      banner.style.color = '#92400E';
+      roleIcon.textContent = '🛡️';
+      roleDesc.innerHTML = `<strong>Sesión activa como Administrador (${sesion.usuario}):</strong> Tienes acceso a la gestión operativa: Catálogo de Rutas, Historial Global de Ventas, Planilla Oficial de Despacho y Gestión de Cancelaciones PQRS. <em>(Nota: Tu cuenta fue creada y aprovisionada por el Superadministrador).</em>`;
+
+      $('historial-title').textContent = 'Historial Global de Transacciones';
+      $('historial-subtitle').textContent = 'Auditoría y control de todos los pasajes emitidos en el sistema';
+      $('container-filtro-historial').style.display = 'flex';
+      setFiltro('todos');
+    } else if (isSuperadmin) {
+      banner.style.background = '#FEF3C7';
+      banner.style.borderColor = '#FCD34D';
+      banner.style.color = '#92400E';
+      roleIcon.textContent = '👑';
+      roleDesc.innerHTML = `<strong>Sesión activa como Superadministrador (${sesion.usuario}):</strong> Tienes control supremo del sistema: Catálogo de Rutas, Historial Global de Ventas, Planilla de Despacho de Flota, Gestión de Cancelaciones PQRS y la potestad exclusiva de <strong>Registrar Usuarios Administradores y asignarles su contraseña</strong>.`;
+
+      $('historial-title').textContent = 'Historial Global de Transacciones';
+      $('historial-subtitle').textContent = 'Auditoría y control de todos los pasajes emitidos en el sistema';
+      $('container-filtro-historial').style.display = 'flex';
+      setFiltro('todos');
+    }
+
+    checkApiStatus();
+    loadProductos();
+    switchTab('catalogo');
+  }
+
+  function doLogout() {
+    sesion = { usuario: null, token: null, rol: null };
+    productoSeleccionado = null;
+    $('screen-app').classList.remove('active');
+    $('screen-auth').classList.add('active');
+    $('inp-login-pass').value = '';
+    toast('Sesión finalizada con éxito.', 'info');
+  }
+
+  // ============ NAVEGACIÓN ENTRE TABS ============
+  function switchTab(tab) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+    const tabBtn = $('nav-' + tab);
+    const panel = $('panel-' + tab);
+    if (tabBtn) tabBtn.classList.add('active');
+    if (panel) panel.classList.add('active');
+
+    if (tab === 'catalogo') loadProductos();
+    if (tab === 'historial') loadHistorial();
+    if (tab === 'soporte-pasajero') {
+      loadComboPasajesParaSoporte();
+      loadMisSolicitudesSoporte();
+    }
+    if (tab === 'despacho') loadPlanilla();
+    if (tab === 'admin') loadAdminTabla();
+    if (tab === 'pqrs-admin') loadAdminPQRS();
+    if (tab === 'gestion-admins') loadListaAdministradores();
+  }
+
+  // ============ CATÁLOGO Y COMPRA ============
+  async function loadProductos() {
+    try {
+      const data = await apiFetch('GET', '/catalogo/rutas', null);
+      todosProductos = data;
+      renderProductos(data);
+    } catch {
+      $('tbody-productos').innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">⚠️</div><h3>Error de conexión con la API REST</h3></div></td></tr>`;
+    }
+  }
+
+  function renderProductos(lista) {
+    if (lista.length === 0) {
+      $('tbody-productos').innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">🔍</div><h3>No hay rutas disponibles en el catálogo</h3></div></td></tr>`;
+      return;
+    }
+    $('tbody-productos').innerHTML = lista.map(p => `
+      <tr id="row-prod-${p.id}" onclick="selectProducto(${p.id})" style="cursor:pointer;">
+        <td><span class="badge badge-blue">#${p.id}</span></td>
+        <td><strong>${p.nombre}</strong></td>
+        <td><span class="precio-tag">${fmt(p.precio)}</span></td>
+        <td>
+          <button class="btn btn-secondary" style="padding:5px 12px; font-size:12px;" onclick="event.stopPropagation(); selectProducto(${p.id})">
+            Seleccionar
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function filtrarProductos() {
+    const q = $('search-productos').value.toLowerCase();
+    const filtrados = todosProductos.filter(p => p.nombre.toLowerCase().includes(q));
+    renderProductos(filtrados);
+  }
+
+  function selectProducto(id) {
+    productoSeleccionado = todosProductos.find(p => p.id === id);
+    if (!productoSeleccionado) return;
+
+    document.querySelectorAll('#tbody-productos tr').forEach(tr => tr.classList.remove('selected'));
+    const row = $(`row-prod-${id}`);
+    if (row) row.classList.add('selected');
+
+    $('checkout-nombre').textContent = productoSeleccionado.nombre;
+    updateTotal();
+  }
+
+  function changeQty(delta) {
+    const inp = $('qty-input');
+    let val = parseInt(inp.value) + delta;
+    val = Math.max(1, Math.min(10, val));
+    inp.value = val;
+    updateTotal();
+  }
+
+  $('qty-input') && $('qty-input').addEventListener('input', updateTotal);
+
+  function updateTotal() {
+    const qty = parseInt($('qty-input').value) || 1;
+    const precio = productoSeleccionado ? productoSeleccionado.precio : 0;
+    $('checkout-total').textContent = fmt(precio * qty);
+  }
+
+  async function doCompra() {
+    if (!productoSeleccionado) return toast('Por favor seleccione una ruta del catálogo.', 'warning');
+    const cantidad = parseInt($('qty-input').value) || 1;
+
+    const btn = $('btn-comprar');
+    btn.innerHTML = '<span class="spinner"></span> Procesando...';
+    btn.disabled = true;
+
+    try {
+      const data = await apiFetch('POST', '/ventas/crear-orden', {
+        usuario: sesion.usuario,
+        producto: productoSeleccionado.nombre,
+        cantidad
+      });
+
+      if (data.exito) {
+        toast(`¡Compra exitosa! Tiquete ${data.tiqueteId} — ${cantidad} pasaje(s).`, 'success');
+        productoSeleccionado = null;
+        $('checkout-nombre').textContent = 'Ninguno seleccionado — haga clic en "Seleccionar"';
+        $('checkout-total').textContent = '$ 0 COP';
+        $('qty-input').value = 1;
+        document.querySelectorAll('#tbody-productos tr').forEach(tr => tr.classList.remove('selected'));
+      } else {
+        toast(data.mensaje || 'Error al procesar la compra.', 'error');
+      }
+    } catch {
+      toast('Error de conexión al procesar la compra.', 'error');
+    } finally {
+      btn.innerHTML = '✅ Confirmar Compra';
+      btn.disabled = false;
+    }
+  }
+
+  // ============ HISTORIAL ============
+  function setFiltro(f) {
+    filtroHistorial = f;
+    $('filtro-mios').classList.toggle('active', f === 'mios');
+    $('filtro-todos').classList.toggle('active', f === 'todos');
+    loadHistorial();
+  }
+
+  async function loadHistorial() {
+    const endpoint = (filtroHistorial === 'mios' || sesion.rol === 'pasajero')
+      ? `/ventas/historial?usuario=${sesion.usuario}`
+      : '/ventas/historial';
+
+    try {
+      const data = await apiFetch('GET', endpoint, null);
+      misComprasUsuario = (sesion.rol === 'pasajero') ? data : data.filter(c => c.usuario === sesion.usuario);
+
+      const totalTiquetes = data.reduce((acc, c) => acc + c.cantidad, 0);
+      $('stat-transacciones').textContent = data.length;
+      $('stat-tiquetes').textContent = totalTiquetes;
+
+      if (data.length === 0) {
+        $('tbody-historial').innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div><h3>Sin compras registradas</h3><p>Las compras aparecerán aquí al reservar pasajes</p></div></td></tr>`;
+        return;
+      }
+
+      $('tbody-historial').innerHTML = data.map(c => {
+        let actionBtn = '';
+        if (sesion.rol === 'pasajero') {
+          actionBtn = `<button class="btn btn-warning" style="padding:5px 10px; font-size:12px;" onclick="iniciarCancelacion(${c.id})">🎧 Solicitar Cancelar</button>`;
+        } else {
+          actionBtn = `<button class="btn btn-danger" style="padding:5px 10px; font-size:12px;" onclick="eliminarCompraDirecta(${c.id})">🗑 Eliminar Viaje</button>`;
+        }
+
+        return `
+          <tr>
+            <td><span class="badge badge-green">#${c.id}</span></td>
+            <td>👤 <strong>${c.usuario}</strong></td>
+            <td>${c.producto}</td>
+            <td><span class="badge badge-blue">${c.cantidad} ${c.cantidad === 1 ? 'silla' : 'sillas'}</span></td>
+            <td>${actionBtn}</td>
+          </tr>
+        `;
+      }).join('');
+    } catch {
+      $('tbody-historial').innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">⚠️</div><h3>Error al consultar historial</h3></div></td></tr>`;
+    }
+  }
+
+  // ============ SERVICIO AL CLIENTE (PASAJERO) ============
+  function iniciarCancelacion(compraId) {
+    switchTab('soporte-pasajero');
+    setTimeout(() => {
+      const select = $('soporte-select-compra');
+      if (select) select.value = compraId;
+    }, 200);
+  }
+
+  async function loadComboPasajesParaSoporte() {
+    try {
+      const data = await apiFetch('GET', `/ventas/historial?usuario=${sesion.usuario}`, null);
+      const select = $('soporte-select-compra');
+      if (!data || data.length === 0) {
+        select.innerHTML = '<option value="">No tienes pasajes activos para cancelar</option>';
+        return;
+      }
+      select.innerHTML = data.map(c => `
+        <option value="${c.id}">ID #${c.id} — ${c.producto} (${c.cantidad} pasajes)</option>
+      `).join('');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function doSolicitarCancelacion() {
+    const compraId = $('soporte-select-compra').value;
+    const motivo = $('soporte-motivo').value;
+    const contacto = $('soporte-contacto').value.trim();
+    const obs = $('soporte-obs').value.trim();
+
+    if (!compraId) {
+      return showAlert('soporte-alert', 'Seleccione un viaje para solicitar cancelación.', 'error');
+    }
+    if (!contacto) {
+      return showAlert('soporte-alert', 'Indique un teléfono o correo de contacto para el asesor.', 'error');
+    }
+
+    const motivoCompleto = obs ? `${motivo} (Nota: ${obs})` : motivo;
+    const btn = $('btn-enviar-soporte');
+    btn.innerHTML = '<span class="spinner"></span> Radicando...';
+    btn.disabled = true;
+
+    try {
+      const res = await apiFetch('POST', '/servicio-cliente/solicitar-cancelacion', {
+        usuario: sesion.usuario,
+        compraId,
+        motivo: motivoCompleto,
+        contacto
+      });
+
+      if (res.exito) {
+        showAlert('soporte-alert', `✅ ${res.mensaje} Radicado: ${res.radicado}`, 'success');
+        toast(`Solicitud ${res.radicado} radicada exitosamente ante Servicio al Cliente.`, 'success');
+        $('soporte-contacto').value = '';
+        $('soporte-obs').value = '';
+        loadMisSolicitudesSoporte();
+      } else {
+        showAlert('soporte-alert', res.mensaje || 'Error al radicar solicitud.', 'error');
+      }
+    } catch {
+      showAlert('soporte-alert', 'Error de conexión al radicar la solicitud.', 'error');
+    } finally {
+      btn.innerHTML = '📨 Radicar Solicitud ante Servicio al Cliente';
+      btn.disabled = false;
+    }
+  }
+
+  async function loadMisSolicitudesSoporte() {
+    try {
+      const solicitudes = await apiFetch('GET', `/servicio-cliente/mis-solicitudes?usuario=${sesion.usuario}`, null);
+      if (!solicitudes || solicitudes.length === 0) {
+        $('tbody-mis-solicitudes').innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><h3>No tiene solicitudes de cancelación radicadas</h3></div></td></tr>`;
+        return;
+      }
+
+      $('tbody-mis-solicitudes').innerHTML = solicitudes.map(s => {
+        let badgeEstado = 'badge-yellow';
+        if (s.estado.includes('APROBADA')) badgeEstado = 'badge-green';
+        if (s.estado.includes('RECHAZADA')) badgeEstado = 'badge-red';
+
+        return `
+          <tr>
+            <td><strong>${s.radicado}</strong></td>
+            <td>${s.ruta}</td>
+            <td>${s.motivo}</td>
+            <td><small>${s.fecha}</small></td>
+            <td><span class="badge ${badgeEstado}">${s.estado}</span></td>
+            <td>${s.respuesta_admin || 'En proceso'}</td>
+          </tr>
+        `;
+      }).join('');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // ============ GESTIÓN DE PQRS / CANCELACIONES (SUPERADMIN) ============
+  async function loadAdminPQRS() {
+    try {
+      const solicitudes = await apiFetch('GET', '/servicio-cliente/solicitudes', null);
+      if (!solicitudes || solicitudes.length === 0) {
+        $('tbody-admin-pqrs').innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🎉</div><h3>No hay solicitudes de cancelación pendientes</h3></div></td></tr>`;
+        return;
+      }
+
+      $('tbody-admin-pqrs').innerHTML = solicitudes.map(s => {
+        let badgeEstado = 'badge-yellow';
+        let actionCol = '';
+
+        if (s.estado === 'PENDIENTE') {
+          badgeEstado = 'badge-yellow';
+          actionCol = `
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-success" style="padding:4px 8px; font-size:11px;" onclick="gestionarPQRS(${s.id}, 'APROBAR')">
+                ✅ Aprobar y Eliminar Viaje
+              </button>
+              <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="gestionarPQRS(${s.id}, 'RECHAZAR')">
+                ❌ Rechazar
+              </button>
+            </div>
+          `;
+        } else if (s.estado.includes('APROBADA')) {
+          badgeEstado = 'badge-green';
+          actionCol = `<span style="font-size:12px; color:var(--verde);">✔️ Viaje Eliminado</span>`;
+        } else {
+          badgeEstado = 'badge-red';
+          actionCol = `<span style="font-size:12px; color:#DC2626;">✖️ Rechazada</span>`;
+        }
+
+        return `
+          <tr>
+            <td><strong>${s.radicado}</strong></td>
+            <td>👤 ${s.usuario}</td>
+            <td>#${s.compra_id} - ${s.ruta}</td>
+            <td>${s.motivo}<br><small style="color:var(--gris-600);">📞 Contacto: ${s.contacto}</small></td>
+            <td><small>${s.fecha}</small></td>
+            <td><span class="badge ${badgeEstado}">${s.estado}</span></td>
+            <td>${actionCol}</td>
+          </tr>
+        `;
+      }).join('');
+    } catch {
+      $('tbody-admin-pqrs').innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⚠️</div><h3>Error al cargar solicitudes</h3></div></td></tr>`;
+    }
+  }
+
+  async function gestionarPQRS(solicitudId, accion) {
+    const confirmMsg = (accion === 'APROBAR')
+      ? '¿Confirma que desea APROBAR la solicitud y ELIMINAR el viaje de la base de datos?'
+      : '¿Desea rechazar la solicitud de cancelación?';
+
+    if (!confirm(confirmMsg)) return;
+
+    const nota = prompt('Ingrese una respuesta u observación de Servicio al Cliente:', accion === 'APROBAR' ? 'Viaje eliminado y anulación procesada tras contacto telefónico.' : 'Solicitud no cumple con los términos de anticipación.');
+
+    try {
+      const res = await apiFetch('POST', '/servicio-cliente/gestionar-solicitud', {
+        solicitudId,
+        accion,
+        respuesta: nota
+      });
+
+      if (res.exito) {
+        toast(res.mensaje, 'success');
+        loadAdminPQRS();
+        loadHistorial();
+      } else {
+        toast(res.mensaje || 'Error al procesar la solicitud.', 'error');
+      }
+    } catch {
+      toast('Error de conexión con la API REST.', 'error');
+    }
+  }
+
+  async function eliminarCompraDirecta(id) {
+    if (!confirm(`¿Está seguro de eliminar directamente el viaje #${id} de la base de datos?`)) return;
+    try {
+      const res = await apiFetch('DELETE', `/ventas/compras/${id}`, null);
+      if (res.exito) {
+        toast(`Viaje #${id} eliminado con éxito.`, 'success');
+        loadHistorial();
+      } else {
+        toast(res.mensaje || 'Error al eliminar.', 'error');
+      }
+    } catch {
+      toast('Error de conexión.', 'error');
+    }
+  }
+
+  // ============ GESTIÓN DE ADMINISTRADORES (SUPERADMIN) ============
+  async function loadListaAdministradores() {
+    try {
+      const admins = await apiFetch('GET', '/superadmin/listar-administradores', null);
+      if (!admins || admins.length === 0) {
+        $('tbody-lista-admins').innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👥</div><h3>No hay administradores registrados</h3></div></td></tr>`;
+        return;
+      }
+
+      $('tbody-lista-admins').innerHTML = admins.map(a => `
+        <tr>
+          <td><span class="badge badge-blue">#${a.id}</span></td>
+          <td>👤 <strong>${a.usuario}</strong></td>
+          <td><span class="badge badge-yellow">${a.rol}</span></td>
+          <td><span class="badge badge-green">✅ Activo</span></td>
+          <td style="color:var(--gris-600); font-size:12px;">Puede iniciar sesión con las credenciales asignadas por el Superadministrador. <strong>No puede autoregistrarse</strong> en el formulario público.</td>
+        </tr>
+      `).join('');
+    } catch {
+      $('tbody-lista-admins').innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">⚠️</div><h3>Error al cargar lista de administradores</h3></div></td></tr>`;
+    }
+  }
+
+  async function doCrearAdministrador() {
+    const usuario = $('nuevo-admin-user').value.trim();
+    const clave   = $('nuevo-admin-pass').value.trim();
+    if (!usuario || !clave) {
+      return showAlert('superadmin-alert', 'Ingrese el usuario y la contraseña del nuevo administrador.', 'error');
+    }
+
+    try {
+      const res = await apiFetch('POST', '/superadmin/crear-administrador', { usuario, clave });
+      if (res.exito) {
+        showAlert('superadmin-alert', res.mensaje, 'success');
+        toast(`Administrador '${usuario}' creado por Superadmin.`, 'success');
+        $('nuevo-admin-user').value = '';
+        $('nuevo-admin-pass').value = '';
+        loadListaAdministradores();
+      } else {
+        showAlert('superadmin-alert', res.mensaje || 'Error al crear administrador.', 'error');
+      }
+    } catch {
+      showAlert('superadmin-alert', 'Error de conexión con la API REST.', 'error');
+    }
+  }
+
+  // ============ DESPACHO (SUPERADMIN) ============
+  async function loadPlanilla() {
+    try {
+      const data = await apiFetch('GET', '/despachos/planilla', null);
+      if (data.exito === false) {
+        return toast(data.mensaje || 'Acceso no autorizado.', 'error');
+      }
+      $('planilla-id').textContent = data.planillaId || 'PLN-2026-0928';
+      $('planilla-bus').textContent = data.busNumero || 'MÓVIL-4052';
+      $('planilla-conductor').textContent = data.conductor || 'Carlos Alberto Mendoza';
+      $('planilla-ruta').textContent = data.ruta || 'Bogotá → Medellín';
+      $('planilla-total').textContent = data.totalPasajes || 0;
+      $('planilla-estado').textContent = `● ${data.estado || 'ACTIVA'}`;
+
+      const pasajeros = data.pasajeros || [];
+      if (pasajeros.length === 0) {
+        $('tbody-despacho').innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">🚌</div><h3>Sin pasajeros en la planilla</h3></div></td></tr>`;
+        return;
+      }
+
+      $('tbody-despacho').innerHTML = pasajeros.map((c, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>👤 ${c.usuario}</td>
+          <td>${c.producto}</td>
+          <td><span class="badge badge-green">${c.cantidad} pasajes</span></td>
+        </tr>
+      `).join('');
+    } catch {
+      toast('Error al consultar la planilla de despacho.', 'error');
+    }
+  }
+
+  // ============ GESTIÓN DE CATÁLOGO (SUPERADMIN) ============
+  let adminSeleccionadoId = null;
+
+  async function loadAdminTabla() {
+    try {
+      const data = await apiFetch('GET', '/catalogo/rutas', null);
+      todosProductos = data;
+      if (data.length === 0) {
+        $('tbody-admin').innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">📦</div><h3>Catálogo vacío</h3></div></td></tr>`;
+        return;
+      }
+      $('tbody-admin').innerHTML = data.map(p => `
+        <tr id="adm-row-${p.id}" onclick="selectAdminRow(${p.id})" style="cursor:pointer;">
+          <td><span class="badge badge-blue">#${p.id}</span></td>
+          <td>${p.nombre}</td>
+          <td><span class="precio-tag">${fmt(p.precio)}</span></td>
+          <td><code style="font-size:11px; color:var(--azul-light);">DELETE /api/v1/catalogo/rutas/${p.id}</code></td>
+        </tr>
+      `).join('');
+    } catch {
+      $('tbody-admin').innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">⚠️</div><h3>Error de conexión</h3></div></td></tr>`;
+    }
+  }
+
+  function selectAdminRow(id) {
+    adminSeleccionadoId = id;
+    document.querySelectorAll('[id^="adm-row-"]').forEach(r => r.classList.remove('selected'));
+    const row = $(`adm-row-${id}`);
+    if (row) row.classList.add('selected');
+    const prod = todosProductos.find(p => p.id === id);
+    if (prod) {
+      $('admin-nombre').value = prod.nombre;
+      $('admin-precio').value = prod.precio;
+    }
+  }
+
+  async function doAgregarProducto() {
+    const nombre = $('admin-nombre').value.trim();
+    const precio = parseFloat($('admin-precio').value);
+    if (!nombre || !precio || precio <= 0) {
+      return showAlert('admin-alert', 'Ingrese una ruta y tarifa válida.', 'error');
+    }
+    try {
+      const data = await apiFetch('POST', '/catalogo/rutas', { nombre, precio });
+      if (data.exito) {
+        showAlert('admin-alert', 'Ruta registrada exitosamente en el catálogo.', 'success');
+        $('admin-nombre').value = '';
+        $('admin-precio').value = '';
+        loadAdminTabla();
+        loadProductos();
+        toast('Ruta agregada al catálogo.', 'success');
+      } else {
+        showAlert('admin-alert', data.mensaje || 'Error al registrar.', 'error');
+      }
+    } catch {
+      showAlert('admin-alert', 'Error de conexión con el backend.', 'error');
+    }
+  }
+
+  async function doEliminarProducto() {
+    if (!adminSeleccionadoId) {
+      return showAlert('admin-alert', 'Seleccione una ruta de la tabla para eliminar.', 'error');
+    }
+    try {
+      const data = await apiFetch('DELETE', `/catalogo/rutas/${adminSeleccionadoId}`, null);
+      if (data.exito) {
+        showAlert('admin-alert', 'Ruta eliminada del catálogo.', 'success');
+        adminSeleccionadoId = null;
+        loadAdminTabla();
+        loadProductos();
+        toast('Ruta eliminada con éxito.', 'success');
+      } else {
+        showAlert('admin-alert', data.mensaje || 'Error al eliminar.', 'error');
+      }
+    } catch {
+      showAlert('admin-alert', 'Error de conexión con el backend.', 'error');
+    }
+  }
+
+  // Teclado
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && $('screen-auth').classList.contains('active')) {
+      const loginVisible = $('tab-login').style.display !== 'none';
+      if (loginVisible) doLogin();
+      else doRegister();
+    }
+  });
+
+  // Init
+  window.addEventListener('load', checkApiStatus);
+</script>
+</body>
+</html>

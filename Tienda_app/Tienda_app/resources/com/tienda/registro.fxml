@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.tienda.Registro"
+      spacing="12" alignment="CENTER" prefWidth="420" prefHeight="360"
+      style="-fx-background-color: #F8F9FA; -fx-padding: 30;">
+
+    <Label text="Crear Cuenta de Usuario" 
+           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;"/>
+    <Label text="Ingrese sus datos para acceder al sistema de pasajes" 
+           style="-fx-font-size: 11px; -fx-text-fill: #6B7280;"/>
+
+    <Separator prefWidth="300" style="-fx-padding: 5 0 10 0;"/>
+
+    <TextField fx:id="txtUsuario" promptText="Nombre de Usuario" 
+               prefHeight="36" style="-fx-font-size: 13px; -fx-background-radius: 6;"/>
+
+    <PasswordField fx:id="txtPassword" promptText="Contraseña de Acceso" 
+                   prefHeight="36" style="-fx-font-size: 13px; -fx-background-radius: 6;"/>
+
+    <Button fx:id="btnRegistrar" text="Registrar Usuario" onAction="#onRegistrar"
+            prefHeight="38" prefWidth="250"
+            style="-fx-background-color: #2563EB; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"/>
+
+    <Button text="← Volver al Inicio de Sesión" onAction="#volverLogin"
+            prefHeight="32" prefWidth="250"
+            style="-fx-background-color: transparent; -fx-text-fill: #4B5563; -fx-cursor: hand; -fx-underline: true;"/>
+
+    <Label fx:id="lblEstado" text="" wrapText="true" alignment="CENTER" textAlignment="CENTER"
+           style="-fx-font-size: 12px; -fx-padding: 5 0 0 0;"/>
+</VBox>

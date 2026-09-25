@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.tienda.Login"
+      spacing="12" alignment="CENTER" prefWidth="420" prefHeight="380"
+      style="-fx-background-color: #F8F9FA; -fx-padding: 30;">
+
+    <Label text="Expreso Bolivariano" 
+           style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #DC2626;"/>
+    <Label text="Plataforma de Pasajes y Tienda" 
+           style="-fx-font-size: 13px; -fx-text-fill: #1E3A8A; -fx-font-weight: bold;"/>
+    <Label text="Inicie sesión para acceder a los módulos de servicio" 
+           style="-fx-font-size: 11px; -fx-text-fill: #6B7280;"/>
+
+    <Separator prefWidth="300" style="-fx-padding: 5 0 10 0;"/>
+
+    <TextField fx:id="txtUsuario" promptText="Nombre de Usuario"
+               prefHeight="36" style="-fx-font-size: 13px; -fx-background-radius: 6;"/>
+
+    <PasswordField fx:id="txtPassword" promptText="Contraseña"
+                   prefHeight="36" style="-fx-font-size: 13px; -fx-background-radius: 6;"/>
+
+    <Button fx:id="btnLogin" text="Ingresar al Sistema" onAction="#onLogin"
+            prefHeight="38" prefWidth="260"
+            style="-fx-background-color: #DC2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"/>
+
+    <Button text="¿No tiene cuenta? Crear nuevo usuario" onAction="#abrirRegistro"
+            prefHeight="32" prefWidth="260"
+            style="-fx-background-color: #E5E7EB; -fx-text-fill: #1F2937; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"/>
+
+    <Label fx:id="lblEstado" text="" wrapText="true" alignment="CENTER" textAlignment="CENTER"
+           style="-fx-font-size: 12px; -fx-padding: 5 0 0 0;"/>
+</VBox>
