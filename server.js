@@ -1,6 +1,8 @@
 const express = require('express');
 const Database = require('better-sqlite3');
 const path = require('path');
+const swaggerUi = require('swagger-ui-express');
+const openapi = require('./openapi.json');
 
 const app = express();
 const PORT = 3000;
@@ -78,6 +80,12 @@ if (totalProductos === 0) {
 // Middlewares
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Registro de servicios: documentación OpenAPI con Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapi, {
+  customSiteTitle: 'API Expreso Bolivariano',
+  swaggerOptions: { persistAuthorization: true }
+}));
 
 // Middleware de verificación de roles para API REST (RBAC)
 function verificarRol(rolesPermitidos = []) {
