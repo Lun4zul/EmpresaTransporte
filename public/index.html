@@ -747,6 +747,10 @@
     <button class="nav-tab" onclick="switchTab('gestion-admins')" id="nav-gestion-admins" style="display:none;">
       <span class="tab-icon">👥</span> Registrar Administradores
     </button>
+    <!-- TODOS LOS ROLES: Documentación de los servicios REST (Swagger UI) -->
+    <button class="nav-tab" onclick="switchTab('api-docs')" id="nav-api-docs">
+      <span class="tab-icon">📘</span> Documentación API
+    </button>
   </nav>
 
   <!-- APP BODY -->
@@ -1186,6 +1190,24 @@
       </div>
     </div>
 
+    <!-- ==========================================
+         TAB 8: DOCUMENTACIÓN DE LA API (Todos los roles)
+    =========================================== -->
+    <div id="panel-api-docs" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📘 Registro de Servicios REST (OpenAPI)</div>
+            <div class="card-subtitle">Catálogo de los servicios que consume la aplicación: endpoints, parámetros, respuestas y roles autorizados</div>
+          </div>
+          <a class="btn btn-secondary" href="/api-docs" target="_blank" rel="noopener">↗ Abrir en ventana nueva</a>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <iframe id="frame-api-docs" title="Documentación API" style="width:100%; height:75vh; border:0; display:block;"></iframe>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- FOOTER -->
@@ -1456,6 +1478,7 @@
     if (tab === 'admin') loadAdminTabla();
     if (tab === 'pqrs-admin') loadAdminPQRS();
     if (tab === 'gestion-admins') loadListaAdministradores();
+    if (tab === 'api-docs' && !$('frame-api-docs').src) $('frame-api-docs').src = '/api-docs';
   }
 
   // ============ CATÁLOGO Y COMPRA ============

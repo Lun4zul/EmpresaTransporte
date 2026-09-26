@@ -1,0 +1,439 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API REST Expreso Bolivariano",
+    "version": "1.0.0",
+    "description": "Catálogo de servicios publicados por el proveedor (Node.js + Express). Los endpoints protegidos validan el rol mediante la cabecera `x-user-role` (pasajero, admin o superadmin); el superadministrador tiene acceso a todas las rutas protegidas. Use el botón **Authorize** para enviar las cabeceras en las pruebas."
+  },
+  "servers": [
+    { "url": "/api/v1", "description": "Servidor local" }
+  ],
+  "tags": [
+    { "name": "AuthUserService", "description": "Autenticación, registro de pasajeros y aprovisionamiento de administradores" },
+    { "name": "CatalogDispatchService", "description": "Catálogo de rutas y planilla de despacho" },
+    { "name": "BookingSupportService", "description": "Ventas, historial y solicitudes de cancelación (PQRS)" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "RolUsuario": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-user-role",
+        "description": "Rol del usuario: pasajero, admin o superadmin"
+      },
+      "NombreUsuario": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-user-name",
+        "description": "Nombre del usuario de la sesión"
+      }
+    },
+    "schemas": {
+      "Respuesta": {
+        "type": "object",
+        "properties": {
+          "exito": { "type": "boolean", "example": true },
+          "mensaje": { "type": "string", "example": "Operación realizada." }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "exito": { "type": "boolean", "example": false },
+          "mensaje": { "type": "string", "example": "Descripción del error." }
+        }
+      },
+      "Credenciales": {
+        "type": "object",
+        "required": ["usuario", "clave"],
+        "properties": {
+          "usuario": { "type": "string", "example": "cliente1" },
+          "clave": { "type": "string", "example": "1234" }
+        }
+      },
+      "Usuario": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 2 },
+          "usuario": { "type": "string", "example": "admin" },
+          "rol": { "type": "string", "example": "admin" }
+        }
+      },
+      "Ruta": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "nombre": { "type": "string", "example": "Pasaje Bogotá - Medellín (Servicio 2G)" },
+          "precio": { "type": "number", "example": 85000 }
+        }
+      },
+      "Compra": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "usuario": { "type": "string", "example": "cliente1" },
+          "producto": { "type": "string", "example": "Pasaje Bogotá - Medellín (Servicio 2G)" },
+          "cantidad": { "type": "integer", "example": 2 }
+        }
+      },
+      "Solicitud": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "radicado": { "type": "string", "example": "PQRS-123456" },
+          "usuario": { "type": "string", "example": "cliente1" },
+          "compra_id": { "type": "integer", "example": 1 },
+          "ruta": { "type": "string", "example": "Pasaje Bogotá - Medellín (Servicio 2G)" },
+          "motivo": { "type": "string", "example": "Cambio de fecha del viaje" },
+          "contacto": { "type": "string", "example": "3001234567" },
+          "estado": { "type": "string", "example": "PENDIENTE" },
+          "fecha": { "type": "string", "example": "26/9/2026, 4:30:00 p. m." },
+          "respuesta_admin": { "type": "string", "example": "En revisión por el equipo de Servicio al Cliente" }
+        }
+      }
+    },
+    "responses": {
+      "Datos400": {
+        "description": "Datos incompletos o inválidos",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "SinRol401": {
+        "description": "Falta la cabecera x-user-role",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "Prohibido403": {
+        "description": "El rol no tiene permiso sobre el recurso",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "NoEncontrado404": {
+        "description": "Recurso no encontrado",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      }
+    },
+    "parameters": {
+      "IdRuta": {
+        "name": "id", "in": "path", "required": true,
+        "schema": { "type": "integer" }, "description": "Identificador de la ruta"
+      },
+      "IdCompra": {
+        "name": "id", "in": "path", "required": true,
+        "schema": { "type": "integer" }, "description": "Identificador de la compra"
+      }
+    }
+  },
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["AuthUserService"],
+        "summary": "Iniciar sesión",
+        "description": "Valida las credenciales y devuelve el rol del usuario. Acceso público.",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Credenciales" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Autenticación exitosa",
+            "content": { "application/json": { "example": {
+              "exito": true, "mensaje": "Bienvenido al sistema, cliente1",
+              "usuario": "cliente1", "rol": "pasajero", "token": "JWT-BOLIVARIANO-PASAJERO-1790000000000"
+            } } }
+          },
+          "400": { "$ref": "#/components/responses/Datos400" },
+          "401": {
+            "description": "Usuario o contraseña incorrectos",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["AuthUserService"],
+        "summary": "Registrar pasajero",
+        "description": "Registro público; siempre crea usuarios con rol pasajero.",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": {
+            "schema": { "$ref": "#/components/schemas/Credenciales" },
+            "example": { "usuario": "pasajero_nuevo", "clave": "clave123" }
+          } }
+        },
+        "responses": {
+          "200": {
+            "description": "Pasajero registrado",
+            "content": { "application/json": { "example": {
+              "exito": true, "mensaje": "¡Cuenta de Pasajero creada exitosamente! Ya puede iniciar sesión con sus credenciales.",
+              "usuario": "pasajero_nuevo", "rol": "pasajero"
+            } } }
+          },
+          "400": { "description": "Datos incompletos o el usuario ya existe",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/superadmin/crear-administrador": {
+      "post": {
+        "tags": ["AuthUserService"],
+        "summary": "Crear administrador",
+        "description": "Crea una cuenta con rol admin. Requiere rol **superadmin**.",
+        "security": [{ "RolUsuario": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": {
+            "schema": { "$ref": "#/components/schemas/Credenciales" },
+            "example": { "usuario": "admin_regional", "clave": "clave123" }
+          } }
+        },
+        "responses": {
+          "200": { "description": "Administrador creado",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Respuesta" } } } },
+          "400": { "description": "Datos incompletos o el usuario ya existe",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "$ref": "#/components/responses/SinRol401" },
+          "403": { "$ref": "#/components/responses/Prohibido403" }
+        }
+      }
+    },
+    "/superadmin/listar-administradores": {
+      "get": {
+        "tags": ["AuthUserService"],
+        "summary": "Listar administradores",
+        "description": "Requiere rol **superadmin**.",
+        "security": [{ "RolUsuario": [] }],
+        "responses": {
+          "200": { "description": "Lista de administradores",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Usuario" } } } } },
+          "401": { "$ref": "#/components/responses/SinRol401" },
+          "403": { "$ref": "#/components/responses/Prohibido403" }
+        }
+      }
+    },
+    "/catalogo/rutas": {
+      "get": {
+        "tags": ["CatalogDispatchService"],
+        "summary": "Consultar rutas y tarifas",
+        "description": "Acceso público.",
+        "responses": {
+          "200": { "description": "Catálogo de rutas",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Ruta" } } } } }
+        }
+      },
+      "post": {
+        "tags": ["CatalogDispatchService"],
+        "summary": "Registrar ruta",
+        "description": "Requiere rol **admin** o **superadmin**.",
+        "security": [{ "RolUsuario": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": {
+            "schema": {
+              "type": "object", "required": ["nombre", "precio"],
+              "properties": { "nombre": { "type": "string" }, "precio": { "type": "number" } }
+            },
+            "example": { "nombre": "Pasaje Bogotá - Tunja (Servicio Plus)", "precio": 38000 }
+          } }
+        },
+        "responses": {
+          "200": { "description": "Ruta registrada",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Respuesta" } } } },
+          "400": { "$ref": "#/components/responses/Datos400" },
+          "401": { "$ref": "#/components/responses/SinRol401" },
+          "403": { "$ref": "#/components/responses/Prohibido403" }
+        }
+      }
+    },
+    "/catalogo/rutas/{id}": {
+      "delete": {
+        "tags": ["CatalogDispatchService"],
+        "summary": "Eliminar ruta",
+        "description": "Requiere rol **admin** o **superadmin**.",
+        "security": [{ "RolUsuario": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/IdRuta" }],
+        "responses": {
+          "200": { "description": "Ruta eliminada",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Respuesta" } } } },
+          "401": { "$ref": "#/components/responses/SinRol401" },
+          "403": { "$ref": "#/components/responses/Prohibido403" },
+          "404": { "$ref": "#/components/responses/NoEncontrado404" }
+        }
+      }
+    },
+    "/despachos/planilla": {
+      "get": {
+        "tags": ["CatalogDispatchService"],
+        "summary": "Generar planilla de despacho",
+        "description": "Consolida las compras registradas en la planilla del bus. Requiere rol **admin** o **superadmin**.",
+        "security": [{ "RolUsuario": [] }],
+        "responses": {
+          "200": {
+            "description": "Planilla de despacho",
+            "content": { "application/json": { "example": {
+              "empresa": "Expreso Bolivariano S.A.", "planillaId": "PLN-2026-0928", "busNumero": "MÓVIL-4052",
+              "conductor": "Carlos Alberto Mendoza", "ruta": "Bogotá Terminal Salitre → Medellín Terminal Norte",
+              "totalTransacciones": 1, "totalPasajes": 2,
+              "pasajeros": [{ "id": 1, "usuario": "cliente1", "producto": "Pasaje Bogotá - Medellín (Servicio 2G)", "cantidad": 2 }],
+              "estado": "ACTIVA"
+            } } }
+          },
+          "401": { "$ref": "#/components/responses/SinRol401" },
+          "403": { "$ref": "#/components/responses/Prohibido403" }
+        }
+      }
+    },
+    "/ventas/crear-orden": {
+      "post": {
+        "tags": ["BookingSupportService"],
+        "summary": "Comprar pasaje",
+        "description": "Registra la compra y genera el código de tiquete TQK-XXXXXX.",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": {
+            "schema": {
+              "type": "object", "required": ["usuario", "producto", "cantidad"],
+              "properties": { "usuario": { "type": "string" }, "producto": { "type": "string" }, "cantidad": { "type": "integer" } }
+            },
+            "example": { "usuario": "cliente1", "producto": "Pasaje Bogotá - Medellín (Servicio 2G)", "cantidad": 2 }
+          } }
+        },
+        "responses": {
+          "200": {
+            "description": "Compra registrada",
+            "content": { "application/json": { "example": {
+              "exito": true, "mensaje": "¡Compra registrada exitosamente!", "compraId": 1, "tiqueteId": "TQK-123456",
+              "usuario": "cliente1", "producto": "Pasaje Bogotá - Medellín (Servicio 2G)", "cantidad": 2
+            } } }
+          },
+          "400": { "$ref": "#/components/responses/Datos400" },
+          "500": { "description": "Error al registrar la compra",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/ventas/historial": {
+      "get": {
+        "tags": ["BookingSupportService"],
+        "summary": "Consultar historial de compras",
+        "description": "Con rol **pasajero** devuelve solo las compras del usuario indicado en `x-user-name`. Con admin o superadmin devuelve todas, o las de un usuario si se envía el parámetro `usuario`.",
+        "security": [{ "RolUsuario": [], "NombreUsuario": [] }],
+        "parameters": [
+          { "name": "usuario", "in": "query", "required": false, "schema": { "type": "string" }, "description": "Filtrar por usuario" }
+        ],
+        "responses": {
+          "200": { "description": "Lista de compras",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Compra" } } } } }
+        }
+      }
+    },
+    "/ventas/compras/{id}": {
+      "delete": {
+        "tags": ["BookingSupportService"],
+        "summary": "Eliminar compra",
+        "description": "Requiere rol **admin** o **superadmin**.",
+        "security": [{ "RolUsuario": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/IdCompra" }],
+        "responses": {
+          "200": { "description": "Compra eliminada",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Respuesta" } } } },
+          "401": { "$ref": "#/components/responses/SinRol401" },
+          "403": { "$ref": "#/components/responses/Prohibido403" },
+          "404": { "$ref": "#/components/responses/NoEncontrado404" }
+        }
+      }
+    },
+    "/servicio-cliente/solicitar-cancelacion": {
+      "post": {
+        "tags": ["BookingSupportService"],
+        "summary": "Radicar solicitud de cancelación (PQRS)",
+        "description": "El pasajero solo puede solicitar la cancelación de sus propias compras. Genera el radicado PQRS-XXXXXX en estado PENDIENTE.",
+        "security": [{ "RolUsuario": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": {
+            "schema": {
+              "type": "object", "required": ["usuario", "compraId", "motivo"],
+              "properties": {
+                "usuario": { "type": "string" }, "compraId": { "type": "integer" },
+                "motivo": { "type": "string" }, "contacto": { "type": "string" }
+              }
+            },
+            "example": { "usuario": "cliente1", "compraId": 1, "motivo": "Cambio de fecha del viaje", "contacto": "3001234567" }
+          } }
+        },
+        "responses": {
+          "200": {
+            "description": "Solicitud radicada",
+            "content": { "application/json": { "example": {
+              "exito": true, "mensaje": "Solicitud radicada con éxito. El equipo de Servicio al Cliente gestionará la cancelación del viaje.",
+              "radicado": "PQRS-123456", "estado": "PENDIENTE"
+            } } }
+          },
+          "400": { "$ref": "#/components/responses/Datos400" },
+          "403": { "description": "El pasaje pertenece a otro usuario",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "404": { "$ref": "#/components/responses/NoEncontrado404" }
+        }
+      }
+    },
+    "/servicio-cliente/mis-solicitudes": {
+      "get": {
+        "tags": ["BookingSupportService"],
+        "summary": "Consultar mis solicitudes",
+        "description": "Devuelve las solicitudes del usuario indicado en `x-user-name` o en el parámetro `usuario`.",
+        "security": [{ "NombreUsuario": [] }],
+        "parameters": [
+          { "name": "usuario", "in": "query", "required": false, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Solicitudes del usuario",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Solicitud" } } } } },
+          "400": { "description": "Usuario no especificado",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/servicio-cliente/solicitudes": {
+      "get": {
+        "tags": ["BookingSupportService"],
+        "summary": "Listar todas las solicitudes",
+        "description": "Requiere rol **admin** o **superadmin**.",
+        "security": [{ "RolUsuario": [] }],
+        "responses": {
+          "200": { "description": "Todas las solicitudes",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Solicitud" } } } } },
+          "401": { "$ref": "#/components/responses/SinRol401" },
+          "403": { "$ref": "#/components/responses/Prohibido403" }
+        }
+      }
+    },
+    "/servicio-cliente/gestionar-solicitud": {
+      "post": {
+        "tags": ["BookingSupportService"],
+        "summary": "Aprobar o rechazar solicitud",
+        "description": "Con `accion = APROBAR` elimina la compra asociada y marca la solicitud como APROBADA - VIAJE ELIMINADO; con cualquier otro valor la marca como RECHAZADA. Requiere rol **admin** o **superadmin**.",
+        "security": [{ "RolUsuario": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": {
+            "schema": {
+              "type": "object", "required": ["solicitudId", "accion"],
+              "properties": {
+                "solicitudId": { "type": "integer" },
+                "accion": { "type": "string", "enum": ["APROBAR", "RECHAZAR"] },
+                "respuesta": { "type": "string" }
+              }
+            },
+            "example": { "solicitudId": 1, "accion": "APROBAR", "respuesta": "Viaje cancelado tras contacto con el cliente." }
+          } }
+        },
+        "responses": {
+          "200": { "description": "Solicitud gestionada",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Respuesta" } } } },
+          "401": { "$ref": "#/components/responses/SinRol401" },
+          "403": { "$ref": "#/components/responses/Prohibido403" },
+          "404": { "$ref": "#/components/responses/NoEncontrado404" }
+        }
+      }
+    }
+  }
+}
